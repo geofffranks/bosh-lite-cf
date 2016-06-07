@@ -1,0 +1,58 @@
+---
+meta:
+  cf:
+    base_domain: bosh-lite.com # override this if non-traditional bosh-lite
+    system_domain_organization: system
+
+    consul:
+      servers: (( grab jobs.consul_z1.networks.cf.static_ips ))
+    gorouter:
+      servers: (( grab jobs.router_z1.networks.cf.static_ips ))
+    etcd:
+      servers: (( grab jobs.etcd_z1.networks.cf.static_ips ))
+    nats:
+      servers: (( grab jobs.nats_z1.networks.cf.static_ips ))
+
+    uaadb:
+      host: (( grab jobs.postgres_z1.networks.cf.static_ips.0 ))
+      scheme: postgresql
+      port: (( grab properties.databases.port ))
+      user: uaaadmin
+      pass: (( grab properties.databases.roles.uaaadmin.password ))
+
+    ccdb:
+      host: (( grab jobs.postgres_z1.networks.cf.static_ips.0 ))
+      scheme: postgres
+      port: (( grab properties.databases.port ))
+      user: ccadmin
+      pass: (( grab properties.databases.roles.ccadmin.password ))
+
+    blobstore_config:
+      blobstore_type: webdav
+      fog_connection: ~
+
+
+properties:
+  databases:
+    db_scheme: postgres
+    port: 5524
+    roles:
+    - tag: admin
+      name: ccadmin
+      password: (( vault meta.vault_prefix "/creds/db:ccadmin" ))
+    - tag: admin
+      name: uaaadmin
+      password: (( vault meta.vault_prefix "/creds/db:uaaadmin" ))
+    databases:
+    - tag: cc
+      name: ccdb
+      citext: true
+    - tag: uaa
+      name: uaadb
+      citext: true
+    collect_statement_statistics: true
+
+  nfs_server: ~
+
+  logger_endpoint:
+    port: 80

@@ -1,0 +1,4 @@
+---
+name: macbook-sandbox-cf
+meta:
+  vault_prefix: secret/macbook/sandbox/cf
